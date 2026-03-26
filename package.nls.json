@@ -29,5 +29,8 @@
   "config.completionNotificationMode.description": "How the completion notification should behave when a review ends.",
   "config.completionNotificationMode.sticky": "Show a normal notification that stays until dismissed.",
   "config.completionNotificationMode.brief": "Show a short completion notification that disappears automatically.",
-  "config.skipCommitKeywords.description": "If any configured keyword appears in the commit message, the review is skipped."
+  "config.skipCommitKeywords.description": "If any configured keyword appears in the commit message, the review is skipped.",
+  "config.claudeArgs.description": "Extra arguments to pass to the `claude` CLI. Required flags (`--permission-mode dontAsk -p ... --model ...`) are added automatically.",
+  "config.codexArgs.description": "Extra arguments to pass to the `codex` CLI. Required flags (`-a never --model ...`) are added automatically.",
+  "config.copilotArgs.description": "Extra arguments to pass to the `copilot` CLI. Required flags (`--no-ask-user --model ...`) are added automatically."
 }

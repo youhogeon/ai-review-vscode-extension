@@ -16,6 +16,7 @@ import { ReviewDashboardService } from '../services/reviewDashboardService';
 import { ReviewService } from '../services/reviewService';
 import {
   AIReviewConfig,
+  CliProvider,
   GitExtensionApi,
   GitRepository,
   RepoSnapshot,
@@ -413,6 +414,7 @@ export class AIReviewController {
       prompt,
       promptFilePath,
       provider: config.cli,
+      cliArgs: this.resolveCliArgs(config),
       filePath: path.join(reviewDirectory, buildReviewFileName(trigger, current.headCommit)),
       keepReviewFileCount: config.keepReviewFileCount,
       startNotificationMode: config.startNotificationMode,
@@ -442,6 +444,16 @@ export class AIReviewController {
     }
 
     return config.model;
+  }
+
+  private resolveCliArgs(config: AIReviewConfig): string[] {
+    const argsMap: Record<CliProvider, string[]> = {
+      claude: config.claudeArgs,
+      codex: config.codexArgs,
+      copilot: config.copilotArgs
+    };
+
+    return argsMap[config.cli] ?? [];
   }
 
   private enqueueReview(state: RepoState, reviewContext: ReviewContext): void {

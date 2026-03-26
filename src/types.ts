@@ -15,6 +15,9 @@ export interface AIReviewConfig {
   model: string;
   smallChangeModel: string;
   smallChangeLineThreshold: number;
+  claudeArgs: string[];
+  codexArgs: string[];
+  copilotArgs: string[];
   promptFile: string;
   reviewDirectory: string;
   keepReviewFileCount: number;
@@ -43,6 +46,7 @@ export interface ReviewContext {
   prompt: string;
   promptFilePath: string;
   provider: CliProvider;
+  cliArgs: string[];
   filePath: string;
   keepReviewFileCount: number;
   startNotificationMode: StartNotificationMode;

@@ -18,7 +18,7 @@
   "AI review finished with issues for {0}.": "{0}의 AI 리뷰가 문제와 함께 완료되었습니다.",
   "'{0}' CLI is not installed or not found in PATH. Please install it and try again.": "'{0}' CLI가 설치되지 않았거나 PATH에서 찾을 수 없습니다. 설치 후 다시 시도하세요.",
 
-  "AI Review Dashboard": "AI Review 대시보드",
+  "AI Review Dashboard": "AI Review Dashboard",
   "Repository": "저장소",
   "Refresh": "새로고침",
   "Active Runs": "실행 중",

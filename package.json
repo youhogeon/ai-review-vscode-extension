@@ -198,6 +198,33 @@
           "default": [],
           "scope": "resource",
           "description": "%config.skipCommitKeywords.description%"
+        },
+        "aiReview.claudeArgs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "resource",
+          "description": "%config.claudeArgs.description%"
+        },
+        "aiReview.codexArgs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "resource",
+          "description": "%config.codexArgs.description%"
+        },
+        "aiReview.copilotArgs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "resource",
+          "description": "%config.copilotArgs.description%"
         }
       }
     }

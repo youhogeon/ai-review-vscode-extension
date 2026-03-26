@@ -9,7 +9,7 @@ import { ReviewDashboardService } from './reviewDashboardService';
 import { NotificationService } from './notificationService';
 import { ProcessService } from './processService';
 
-type CliBuilder = (prompt: string, model: string) => {
+type CliBuilder = (prompt: string, model: string, extraArgs: string[]) => {
   command: string;
   args: string[];
   input?: string;
@@ -17,28 +17,28 @@ type CliBuilder = (prompt: string, model: string) => {
 };
 
 const CLI_BUILDERS: Record<ReviewContext['provider'], CliBuilder> = {
-  claude(prompt, model) {
-    const args: string[] = [];
+  claude(prompt, model, extraArgs) {
+    const args: string[] = [...extraArgs];
     if (model) {
       args.push('--model', model);
     }
     args.push('--permission-mode', 'dontAsk', '-p', prompt);
     return { command: 'claude', args };
   },
-  codex(prompt, model) {
-    const args = ['-a', 'never', 'exec'];
+  codex(prompt, model, extraArgs) {
+    const args = ['-a', 'never', ...extraArgs, 'exec'];
     if (model) {
       args.push('--model', model);
     }
     args.push('-');
     return { command: 'codex', args, input: prompt };
   },
-  copilot(prompt, model) {
-    const args: string[] = [];
+  copilot(prompt, model, extraArgs) {
+    const args: string[] = [...extraArgs];
     if (model) {
       args.push('--model', model);
     }
-    args.push('-p', prompt, '-s', '--no-ask-user');
+    args.push('-p', prompt, '--no-ask-user');
     return { command: 'copilot', args };
   }
 };
@@ -106,7 +106,7 @@ export class ReviewService {
       reviewContext.startNotificationMode,
       vscode.l10n.t('AI review running: {0} ({1})', path.basename(reviewContext.root), reviewContext.trigger),
       async () => {
-        const invocation = builder(reviewContext.prompt, reviewContext.model);
+        const invocation = builder(reviewContext.prompt, reviewContext.model, reviewContext.cliArgs);
         const promptPreview = this.createPromptPreview(reviewContext.prompt);
         this.output.appendLine(
           `[info] CLI invocation: ${invocation.command} ${invocation.args.map((arg) => JSON.stringify(arg)).join(' ')}`
@@ -176,7 +176,7 @@ export class ReviewService {
       return;
     }
 
-    const commandName = CLI_BUILDERS[reviewContext.provider]('' , '').command;
+    const commandName = CLI_BUILDERS[reviewContext.provider]('', '', []).command;
     const isCommandNotFound =
       (result.exitCode === -1 && /ENOENT/i.test(result.stderr)) ||
       (!result.ok && !result.stdout.trim() && result.stderr.includes(`'${commandName}'`));
