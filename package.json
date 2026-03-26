@@ -93,16 +93,16 @@
         "aiReview.cli": {
           "type": "string",
           "enum": [
-            "claude",
+            "copilot",
             "codex",
-            "copilot"
+            "claude"
           ],
           "enumDescriptions": [
             "%config.cli.claude%",
             "%config.cli.codex%",
             "%config.cli.copilot%"
           ],
-          "default": "claude",
+          "default": "copilot",
           "scope": "resource",
           "description": "%config.cli.description%"
         },
