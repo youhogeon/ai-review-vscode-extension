@@ -1,8 +1,8 @@
 {
   "name": "ai-review",
-  "displayName": "AI Review",
+  "displayName": "AI Review on Git Commit/Push",
   "description": "Automatically request a review from an AI CLI when Git actions (commit, push) occur.",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "icon": "assets/icon.png",
   "publisher": "youhogeon",
   "license": "WTFPL",
