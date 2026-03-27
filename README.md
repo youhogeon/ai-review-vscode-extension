@@ -1,6 +1,8 @@
 # AI Review
 
 VS Code extension that automatically requests an AI code review after a git commit or push.
+<img width="1024" alt="image" src="https://github.com/user-attachments/assets/c04530cb-a074-4a4d-96d6-47d55402f719" />
+
 
 <img width="1440" alt="image" src="https://github.com/user-attachments/assets/5949b8c2-6cb3-4387-831c-577ab8d5cc83" />
 
