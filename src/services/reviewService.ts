@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 
 import { getDefaultPrompt, REVIEW_FILE_PREFIX } from '../constants';
-import { CommandResult, ProcessHandle, PromptBuildOptions, ReviewContext } from '../types';
+import { CommandResult, ProcessHandle, PromptBuildOptions, ReviewContext, ReviewOpenMode } from '../types';
 import { resolvePath } from '../utils';
 import { ReviewDashboardService } from './reviewDashboardService';
 import { NotificationService } from './notificationService';
@@ -70,7 +70,8 @@ export class ReviewService {
       '$commit$': options.commit,
       '$commit_range$': options.commitRange,
       '$trigger$': options.trigger,
-      '$repo$': options.root
+      '$repo$': options.root,
+      '$reviewdir$': options.reviewDirectory
     };
 
     let prompt = template;
@@ -156,7 +157,7 @@ export class ReviewService {
 
     await fs.appendFile(reviewContext.filePath, this.formatProcessResult(result), 'utf8');
     await this.cleanupOldReviewFiles(path.dirname(reviewContext.filePath), reviewContext.keepReviewFileCount);
-    await this.openReviewFile(reviewContext.filePath);
+    await this.openReviewFile(reviewContext.filePath, reviewContext.openMode);
 
     if (result.cancelled) {
       await this.notificationService.showCompletion(
@@ -198,9 +199,32 @@ export class ReviewService {
     );
   }
 
-  private async openReviewFile(filePath: string): Promise<void> {
+  private async openReviewFile(filePath: string, openMode: ReviewOpenMode): Promise<void> {
     const uri = vscode.Uri.file(filePath);
-    await vscode.commands.executeCommand('markdown.showPreview', uri);
+
+    if (openMode === 'markdown') {
+      try {
+        await vscode.commands.executeCommand('markdown.showPreview', uri.with({ fragment: 'final-review-result' }));
+        return;
+      } catch {
+        // fallthrough to text mode
+      }
+    }
+
+    const document = await vscode.workspace.openTextDocument(uri);
+    const editor = await vscode.window.showTextDocument(document, { preview: false });
+    let targetLine = Math.max(0, document.lineCount - 1);
+
+    for (let line = 0; line < document.lineCount; line += 1) {
+      if (document.lineAt(line).text.trim() === '# Final Review Result') {
+        targetLine = line;
+        break;
+      }
+    }
+
+    const target = new vscode.Position(targetLine, 0);
+    editor.selection = new vscode.Selection(target, target);
+    editor.revealRange(new vscode.Range(target, target), vscode.TextEditorRevealType.AtTop);
   }
 
   private async cleanupOldReviewFiles(directory: string, keepCount: number): Promise<void> {

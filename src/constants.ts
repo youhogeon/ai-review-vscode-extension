@@ -9,7 +9,10 @@ export const DEFAULT_PROMPT = [
   '2. Focus on bugs and logical errors.',
   '',
   '## Review Target',
-  'Commit ID: $commit_range$'
+  'Commit ID: $commit_range$',
+  '',
+  '## Answer Principles',
+  '1. If your answer includes file links, use relative paths based on `$reviewdir$` instead of absolute paths.'
 ].join('\n');
 
 const KO_DEFAULT_PROMPT = [
@@ -23,7 +26,8 @@ const KO_DEFAULT_PROMPT = [
   '커밋 ID: $commit_range$',
   '',
   '## 답변 원칙',
-  '1. 답변은 반드시 한국어로 작성하세요.'
+  '1. 답변은 반드시 한국어로 작성하세요.',
+  '2. 답변에 파일 링크가 포함된 경우, 절대 경로를 사용하지 말고 `$reviewdir$`를 기준으로한 상대 경로를 사용하세요.'
 ].join('\n');
 
 export function getDefaultPrompt(locale: string): string {

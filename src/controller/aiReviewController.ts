@@ -393,14 +393,15 @@ export class AIReviewController {
 
     const changedLines = await this.gitService.countChangedLines(root, commitRange);
     const model = this.resolveModel(config, changedLines);
+    const reviewDirectory = resolvePath(root, config.reviewDirectory);
     const prompt = await this.reviewService.buildPrompt({
       root,
       trigger,
       commit: current.headCommit,
       commitRange,
-      promptFile: config.promptFile
+      promptFile: config.promptFile,
+      reviewDirectory
     });
-    const reviewDirectory = resolvePath(root, config.reviewDirectory);
     const promptFilePath = resolvePath(root, config.promptFile);
 
     return {
@@ -418,7 +419,8 @@ export class AIReviewController {
       filePath: path.join(reviewDirectory, buildReviewFileName(trigger, current.headCommit)),
       keepReviewFileCount: config.keepReviewFileCount,
       startNotificationMode: config.startNotificationMode,
-      completionNotificationMode: config.completionNotificationMode
+      completionNotificationMode: config.completionNotificationMode,
+      openMode: config.openMode
     };
   }
 

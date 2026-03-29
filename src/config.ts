@@ -5,6 +5,7 @@ import {
   AIReviewConfig,
   CliProvider,
   CompletionNotificationMode,
+  ReviewOpenMode,
   ReviewTrigger,
   StartNotificationMode
 } from './types';
@@ -14,12 +15,12 @@ export function getConfig(resource: vscode.Uri): AIReviewConfig {
   const config = vscode.workspace.getConfiguration(CONFIG_SECTION, resource);
 
   return {
-    enabled: config.get<boolean>('enabled', true),
-    cli: config.get<CliProvider>('cli', 'claude'),
+    enabled: config.get<boolean>('_enabled', true),
+    cli: config.get<CliProvider>('_cli', 'copilot'),
     trigger: config.get<ReviewTrigger>('trigger', 'commit'),
-    model: normalizeOptionalString(config.get<string>('model', '')),
-    smallChangeModel: normalizeOptionalString(config.get<string>('smallChangeModel', '')),
-    smallChangeLineThreshold: Number(config.get<number>('smallChangeLineThreshold', 50)) || 50,
+    model: normalizeOptionalString(config.get<string>('_model', '')),
+    smallChangeModel: normalizeOptionalString(config.get<string>('_smallChangeModel', '')),
+    smallChangeLineThreshold: Number(config.get<number>('_smallChangeLineThreshold', 50)) || 50,
     claudeArgs: normalizeStringArray(config.get<string[]>('claudeArgs', [])),
     codexArgs: normalizeStringArray(config.get<string[]>('codexArgs', [])),
     copilotArgs: normalizeStringArray(config.get<string[]>('copilotArgs', [])),
@@ -28,7 +29,8 @@ export function getConfig(resource: vscode.Uri): AIReviewConfig {
     keepReviewFileCount: Math.max(1, Number(config.get<number>('keepReviewFileCount', 10)) || 10),
     startNotificationMode: config.get<StartNotificationMode>('startNotificationMode', 'progress'),
     completionNotificationMode: config.get<CompletionNotificationMode>('completionNotificationMode', 'sticky'),
-    skipCommitKeywords: normalizeStringArray(config.get<string[]>('skipCommitKeywords', []))
+    openMode: config.get<ReviewOpenMode>('openMode', 'markdown'),
+    skipCommitKeywords: normalizeStringArray(config.get<string[]>('skipCommitKeywords', ['--wip--']))
   };
 }
 

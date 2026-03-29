@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 
 export type CliProvider = 'claude' | 'codex' | 'copilot';
 export type ReviewTrigger = 'commit' | 'push' | 'commitAndPush' | 'manual';
+export type ReviewOpenMode = 'markdown' | 'text';
 export type StartNotificationMode = 'progress' | 'brief';
 export type CompletionNotificationMode = 'sticky' | 'brief';
 export type ReviewHint = 'commit' | 'push' | 'suppress';
@@ -23,6 +24,7 @@ export interface AIReviewConfig {
   keepReviewFileCount: number;
   startNotificationMode: StartNotificationMode;
   completionNotificationMode: CompletionNotificationMode;
+  openMode: ReviewOpenMode;
   skipCommitKeywords: string[];
 }
 
@@ -51,6 +53,7 @@ export interface ReviewContext {
   keepReviewFileCount: number;
   startNotificationMode: StartNotificationMode;
   completionNotificationMode: CompletionNotificationMode;
+  openMode: ReviewOpenMode;
 }
 
 export interface ReviewRunRecord {
@@ -115,4 +118,5 @@ export interface PromptBuildOptions {
   commit: string;
   commitRange: string;
   promptFile: string;
+  reviewDirectory: string;
 }

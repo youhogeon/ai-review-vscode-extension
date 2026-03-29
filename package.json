@@ -2,7 +2,7 @@
   "name": "ai-review",
   "displayName": "AI Review on Git Commit/Push",
   "description": "Automatically request a review from an AI CLI when Git actions (commit, push) occur.",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "icon": "assets/icon.png",
   "publisher": "youhogeon",
   "license": "WTFPL",
@@ -84,13 +84,13 @@
     "configuration": {
       "title": "%config.title%",
       "properties": {
-        "aiReview.enabled": {
+        "aiReview._enabled": {
           "type": "boolean",
           "default": true,
           "scope": "resource",
           "description": "%config.enabled.description%"
         },
-        "aiReview.cli": {
+        "aiReview._cli": {
           "type": "string",
           "enum": [
             "copilot",
@@ -105,6 +105,25 @@
           "default": "copilot",
           "scope": "resource",
           "description": "%config.cli.description%"
+        },
+        "aiReview._model": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "%config.model.description%"
+        },
+        "aiReview._smallChangeModel": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "%config.smallChangeModel.description%"
+        },
+        "aiReview._smallChangeLineThreshold": {
+          "type": "number",
+          "default": 50,
+          "minimum": 1,
+          "scope": "resource",
+          "description": "%config.smallChangeLineThreshold.description%"
         },
         "aiReview.trigger": {
           "type": "string",
@@ -124,25 +143,6 @@
           "scope": "resource",
           "description": "%config.trigger.description%"
         },
-        "aiReview.model": {
-          "type": "string",
-          "default": "",
-          "scope": "resource",
-          "description": "%config.model.description%"
-        },
-        "aiReview.smallChangeModel": {
-          "type": "string",
-          "default": "",
-          "scope": "resource",
-          "description": "%config.smallChangeModel.description%"
-        },
-        "aiReview.smallChangeLineThreshold": {
-          "type": "number",
-          "default": 50,
-          "minimum": 1,
-          "scope": "resource",
-          "description": "%config.smallChangeLineThreshold.description%"
-        },
         "aiReview.promptFile": {
           "type": "string",
           "default": ".review/prompt.md",
@@ -154,6 +154,20 @@
           "default": ".review",
           "scope": "resource",
           "description": "%config.reviewDirectory.description%"
+        },
+        "aiReview.openMode": {
+          "type": "string",
+          "enum": [
+            "markdown",
+            "text"
+          ],
+          "enumDescriptions": [
+            "%config.openMode.markdown%",
+            "%config.openMode.text%"
+          ],
+          "default": "markdown",
+          "scope": "resource",
+          "description": "%config.openMode.description%"
         },
         "aiReview.keepReviewFileCount": {
           "type": "number",
@@ -195,7 +209,9 @@
           "items": {
             "type": "string"
           },
-          "default": [],
+          "default": [
+            "--wip--"
+          ],
           "scope": "resource",
           "description": "%config.skipCommitKeywords.description%"
         },

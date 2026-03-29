@@ -35,6 +35,7 @@ VS Code extension that automatically requests an AI code review after a git comm
 | `aiReview.smallChangeLineThreshold` | `50` | Use the lightweight model when changed lines are below this value |
 | `aiReview.promptFile` | `".review/prompt.md"` | Path to the prompt template file |
 | `aiReview.reviewDirectory` | `".review"` | Folder where review files are written |
+| `aiReview.openMode` | `"markdown"` | How to open review files: `markdown` (rendered preview) or `text` (plain editor) |
 | `aiReview.keepReviewFileCount` | `10` | Max number of review files to keep |
 | `aiReview.startNotificationMode` | `"progress"` | Start notification: `progress` or `brief` |
 | `aiReview.completionNotificationMode` | `"sticky"` | Completion notification: `sticky` or `brief` |
@@ -49,7 +50,8 @@ The prompt file can use these placeholders:
 | `$commit$` | Current HEAD commit hash |
 | `$commit_range$` | Commit range for the review |
 | `$trigger$` | What triggered the review (`commit`, `push`, or `manual`) |
-| `$repo$` | Repository root path |
+| `$repo$` | Repository root path (absolute) |
+| `$reviewdir$` | Review output directory path (absolute) |
 
 ## Notes
 
@@ -93,6 +95,7 @@ git 커밋 또는 푸시 이후 자동으로 AI 코드 리뷰를 요청하는 VS
 | `aiReview.smallChangeLineThreshold` | `50` | 변경된 라인 수가 이 값보다 적을 때 경량 모델 사용 |
 | `aiReview.promptFile` | `".review/prompt.md"` | 프롬프트 템플릿 파일 경로 |
 | `aiReview.reviewDirectory` | `".review"` | 리뷰 파일이 작성되는 폴더 |
+| `aiReview.openMode` | `"markdown"` | 리뷰 파일을 여는 방식: `markdown` (렌더링된 미리보기) 또는 `text` (일반 에디터) |
 | `aiReview.keepReviewFileCount` | `10` | 유지할 최대 리뷰 파일 수 |
 | `aiReview.startNotificationMode` | `"progress"` | 시작 알림: `progress` 또는 `brief` |
 | `aiReview.completionNotificationMode` | `"sticky"` | 완료 알림: `sticky` 또는 `brief` |
@@ -107,7 +110,8 @@ git 커밋 또는 푸시 이후 자동으로 AI 코드 리뷰를 요청하는 VS
 | `$commit$` | 현재 HEAD 커밋 해시 |
 | `$commit_range$` | 리뷰를 위한 커밋 범위 |
 | `$trigger$` | 리뷰를 트리거한 이벤트 (`commit`, `push`, 또는 `manual`) |
-| `$repo$` | 저장소 루트 경로 |
+| `$repo$` | 저장소 루트 경로 (절대경로) |
+| `$reviewdir$` | 리뷰 파일 출력 디렉토리 경로 (절대경로) |
 
 ## 참고 사항
 
