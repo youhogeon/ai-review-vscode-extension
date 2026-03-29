@@ -199,20 +199,8 @@ export class ReviewService {
   }
 
   private async openReviewFile(filePath: string): Promise<void> {
-    const document = await vscode.workspace.openTextDocument(vscode.Uri.file(filePath));
-    const editor = await vscode.window.showTextDocument(document, { preview: false });
-    let targetLine = Math.max(0, document.lineCount - 1);
-
-    for (let line = 0; line < document.lineCount; line += 1) {
-      if (document.lineAt(line).text.trim() === '# Final Review Result') {
-        targetLine = line;
-        break;
-      }
-    }
-
-    const target = new vscode.Position(targetLine, 0);
-    editor.selection = new vscode.Selection(target, target);
-    editor.revealRange(new vscode.Range(target, target), vscode.TextEditorRevealType.AtTop);
+    const uri = vscode.Uri.file(filePath);
+    await vscode.commands.executeCommand('markdown.showPreview', uri);
   }
 
   private async cleanupOldReviewFiles(directory: string, keepCount: number): Promise<void> {
