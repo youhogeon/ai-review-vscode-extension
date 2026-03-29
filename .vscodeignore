@@ -1,0 +1,7 @@
+.vscode/**
+src/**
+tsconfig.json
+extension.js
+reference.sh
+*.vsix
+node_modules/**

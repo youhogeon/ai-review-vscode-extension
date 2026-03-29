@@ -1,0 +1,205 @@
+{
+  "name": "ai-review",
+  "displayName": "AI Review",
+  "description": "Automatically request a review from an AI CLI when Git actions (commit, push) occur.",
+  "version": "0.1.0",
+  "icon": "assets/icon.png",
+  "publisher": "youhogeon",
+  "license": "WTFPL",
+  "repository": "https://github.com/youhogeon/ai-review-vscode-extension",
+  "engines": {
+    "vscode": "^1.105.0"
+  },
+  "categories": [
+    "AI",
+    "Other",
+    "SCM Providers",
+    "Linters",
+    "Programming Languages"
+  ],
+  "keywords": [
+    "git",
+    "review",
+    "ai",
+    "codex",
+    "claude",
+    "copilot"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "l10n": "./l10n",
+  "main": "./out/extension.js",
+  "scripts": {
+    "build": "tsc -p ./",
+    "package": "mkdir -p package && npm run build && npx @vscode/vsce package --out package/$npm_package_name-$npm_package_version.vsix"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "@types/vscode": "^1.105.0",
+    "typescript": "^5.9.2",
+    "@vscode/vsce": "^3.7.1"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "aiReview.runManualReview",
+        "title": "%command.runManualReview%",
+        "category": "%category%"
+      },
+      {
+        "command": "aiReview.openDashboard",
+        "title": "%command.openDashboard%",
+        "category": "%category%"
+      },
+      {
+        "command": "aiReview.selectPromptFile",
+        "title": "%command.selectPromptFile%",
+        "category": "%category%"
+      },
+      {
+        "command": "aiReview.selectReviewFolder",
+        "title": "%command.selectReviewFolder%",
+        "category": "%category%"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "aiReview",
+          "title": "%viewContainer.title%",
+          "icon": "assets/activity-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "aiReview": [
+        {
+          "id": "aiReview.dashboard",
+          "name": "%view.dashboard%",
+          "type": "webview"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "%config.title%",
+      "properties": {
+        "aiReview.enabled": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "%config.enabled.description%"
+        },
+        "aiReview.cli": {
+          "type": "string",
+          "enum": [
+            "claude",
+            "codex",
+            "copilot"
+          ],
+          "enumDescriptions": [
+            "%config.cli.claude%",
+            "%config.cli.codex%",
+            "%config.cli.copilot%"
+          ],
+          "default": "claude",
+          "scope": "resource",
+          "description": "%config.cli.description%"
+        },
+        "aiReview.trigger": {
+          "type": "string",
+          "enum": [
+            "commit",
+            "push",
+            "commitAndPush",
+            "manual"
+          ],
+          "enumDescriptions": [
+            "%config.trigger.commit%",
+            "%config.trigger.push%",
+            "%config.trigger.commitAndPush%",
+            "%config.trigger.manual%"
+          ],
+          "default": "commit",
+          "scope": "resource",
+          "description": "%config.trigger.description%"
+        },
+        "aiReview.model": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "%config.model.description%"
+        },
+        "aiReview.smallChangeModel": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "%config.smallChangeModel.description%"
+        },
+        "aiReview.smallChangeLineThreshold": {
+          "type": "number",
+          "default": 50,
+          "minimum": 1,
+          "scope": "resource",
+          "description": "%config.smallChangeLineThreshold.description%"
+        },
+        "aiReview.promptFile": {
+          "type": "string",
+          "default": ".review/prompt.md",
+          "scope": "resource",
+          "description": "%config.promptFile.description%"
+        },
+        "aiReview.reviewDirectory": {
+          "type": "string",
+          "default": ".review",
+          "scope": "resource",
+          "description": "%config.reviewDirectory.description%"
+        },
+        "aiReview.keepReviewFileCount": {
+          "type": "number",
+          "default": 10,
+          "minimum": 1,
+          "scope": "resource",
+          "description": "%config.keepReviewFileCount.description%"
+        },
+        "aiReview.startNotificationMode": {
+          "type": "string",
+          "enum": [
+            "progress",
+            "brief"
+          ],
+          "enumDescriptions": [
+            "%config.startNotificationMode.progress%",
+            "%config.startNotificationMode.brief%"
+          ],
+          "default": "progress",
+          "scope": "resource",
+          "description": "%config.startNotificationMode.description%"
+        },
+        "aiReview.completionNotificationMode": {
+          "type": "string",
+          "enum": [
+            "sticky",
+            "brief"
+          ],
+          "enumDescriptions": [
+            "%config.completionNotificationMode.sticky%",
+            "%config.completionNotificationMode.brief%"
+          ],
+          "default": "sticky",
+          "scope": "resource",
+          "description": "%config.completionNotificationMode.description%"
+        },
+        "aiReview.skipCommitKeywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "resource",
+          "description": "%config.skipCommitKeywords.description%"
+        }
+      }
+    }
+  }
+}
