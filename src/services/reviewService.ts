@@ -206,8 +206,8 @@ export class ReviewService {
       try {
         await vscode.commands.executeCommand('markdown.showPreview', uri.with({ fragment: 'final-review-result' }));
         return;
-      } catch {
-        // fallthrough to text mode
+      } catch (error) {
+        this.output.appendLine(`[warn] markdown.showPreview failed, falling back to text mode: ${error}`);
       }
     }
 
@@ -255,6 +255,10 @@ export class ReviewService {
       `<!-- Commit: ${reviewContext.commit} -->`,
       `<!-- Commit Range: ${reviewContext.commitRange} -->`,
       `<!-- Changed Lines: ${reviewContext.changedLines} -->`,
+      '',
+      '## Prompt',
+      '',
+      reviewContext.prompt,
       '',
     ].join('\n');
   }
