@@ -2,7 +2,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
-import { DEFAULT_PROMPT, REVIEW_FILE_PREFIX } from '../constants';
+import { getDefaultPrompt, REVIEW_FILE_PREFIX } from '../constants';
 import { CommandResult, ProcessHandle, PromptBuildOptions, ReviewContext } from '../types';
 import { resolvePath } from '../utils';
 import { ReviewDashboardService } from './reviewDashboardService';
@@ -55,7 +55,7 @@ export class ReviewService {
 
   async buildPrompt(options: PromptBuildOptions): Promise<string> {
     const resolvedPromptFile = resolvePath(options.root, options.promptFile);
-    let template = DEFAULT_PROMPT;
+    let template = getDefaultPrompt(vscode.env.language);
 
     this.output.appendLine(`[info] Building prompt from: ${resolvedPromptFile}`);
 

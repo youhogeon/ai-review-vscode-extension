@@ -2,15 +2,36 @@ export const CONFIG_SECTION = 'aiReview';
 export const OUTPUT_CHANNEL_NAME = 'AI Review';
 
 export const DEFAULT_PROMPT = [
-  'You are a senior developer who specializes in code review. Review the code according to the rules below.',
+  'You are a senior developer who specializes in code review. Please review the code according to the rules below.',
   '',
   '## Review Principles',
-  '1. Review only the changes introduced by the commit below. Do not review older code outside this commit.',
+  '1. Focus your review on the code included in the target commit. Avoid reviewing code from commits outside the target as much as possible.',
   '2. Focus on bugs and logical errors.',
   '',
   '## Review Target',
   'Commit ID: $commit_range$'
 ].join('\n');
+
+const KO_DEFAULT_PROMPT = [
+  '당신은 코드 리뷰를 전문으로 하는 시니어 개발자입니다. 아래 규칙에 따라 코드를 리뷰해 주세요.',
+  '',
+  '## 리뷰 원칙',
+  '1. 리뷰 대상 커밋에 포함된 코드를 집중적으로 리뷰하세요. 리뷰 대상 커밋 외의 이전 코드는 가급적 리뷰하지 마세요.',
+  '2. 버그와 논리적 오류에 집중하세요.',
+  '',
+  '## 리뷰 대상',
+  '커밋 ID: $commit_range$',
+  '',
+  '## 답변 원칙',
+  '1. 답변은 반드시 한국어로 작성하세요.'
+].join('\n');
+
+export function getDefaultPrompt(locale: string): string {
+  if (locale.startsWith('ko')) {
+    return KO_DEFAULT_PROMPT;
+  }
+  return DEFAULT_PROMPT;
+}
 
 export const OPERATION_COMMIT = 'Commit';
 export const OPERATION_PUSH = 'Push';

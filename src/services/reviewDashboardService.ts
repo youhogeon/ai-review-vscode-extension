@@ -6,6 +6,7 @@ import * as vscode from 'vscode';
 import { getConfig } from '../config';
 import { getPreferredWorkspaceFolder, resolvePath } from '../utils';
 import { CommandResult, ProcessHandle, ReviewRunRecord, ReviewRunStatus } from '../types';
+import { getDefaultPrompt } from '../constants';
 
 interface DashboardWebviewState {
   repositories: DashboardRepositoryViewModel[];
@@ -669,6 +670,7 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
       --warn: #fbbf24;
       --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
       --radius: 18px;
+      font-size: var(--vscode-editor-font-size, 13px);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
@@ -694,8 +696,9 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
 
     .hero {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
+      flex-wrap: wrap;
       gap: 16px;
       padding: 22px 24px;
       border: 1px solid var(--border);
@@ -705,34 +708,51 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
       box-shadow: var(--shadow);
     }
 
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+    }
+
     .hero h1 {
       margin: 0;
-      font-size: 22px;
+      font-size: 1.7rem;
       letter-spacing: -0.02em;
     }
 
-    .hero p {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 13px;
+    .hero-sub {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
-    .hero-actions {
+    .hero-sub .notice {
+      color: var(--warn);
+      font-size: 1rem;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .hero-right {
       display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
+      align-items: flex-start;
+      flex: 1 0 min(260px, 100%);
+      min-width: 0;
+      max-width: 360px;
     }
 
     .hero-select {
       display: grid;
       gap: 4px;
-      min-width: 240px;
+      min-width: 0;
+      width: 100%;
     }
 
     .hero-select label {
       color: var(--muted);
-      font-size: 11px;
+      font-size: 0.85rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
@@ -806,7 +826,7 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
 
     .panel-header h2 {
       margin: 0;
-      font-size: 14px;
+      font-size: 1.08rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--muted);
@@ -880,23 +900,23 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
 
     .run-title {
       font-weight: 700;
-      font-size: 14px;
+      font-size: 1.08rem;
       margin: 0;
       color: var(--text);
     }
 
     .run-meta,
     .run-subtle {
-      font-size: 12px;
+      font-size: 0.92rem;
       color: var(--muted);
       word-break: break-word;
     }
 
     .run-primary {
-      font-size: 18px;
+      font-size: 1.38rem;
       line-height: 1;
       color: var(--text);
-      min-width: 18px;
+      min-width: 1.38rem;
       text-align: left;
     }
 
@@ -906,7 +926,7 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
       gap: 6px;
       padding: 5px 10px;
       border-radius: 999px;
-      font-size: 11px;
+      font-size: 0.85rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
@@ -940,13 +960,13 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
 
     .field label {
       color: var(--muted);
-      font-size: 12px;
+      font-size: 0.92rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
 
     .field .value {
-      font-size: 13px;
+      font-size: 1rem;
       line-height: 1.5;
       word-break: break-word;
     }
@@ -965,7 +985,7 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
     .section-title {
       margin: 0 0 10px;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 0.92rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
@@ -987,7 +1007,7 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
       color: var(--text);
       padding: 16px;
       font-family: 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace;
-      font-size: 13px;
+      font-size: 1rem;
       line-height: 1.6;
       outline: none;
     }
@@ -1008,9 +1028,10 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
     }
 
     .notice {
+      display: none;
       color: var(--warn);
-      font-size: 13px;
-      line-height: 1.6;
+      font-size: 1rem;
+      line-height: 1.5;
     }
 
     @media (max-width: 1080px) {
@@ -1026,21 +1047,103 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
         max-height: none;
         overflow: visible;
       }
+
+      .hero-right {
+        flex: none;
+        width: 100%;
+      }
+
+      .hero-select {
+        min-width: 0;
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .shell {
+        padding: 14px;
+        gap: 12px;
+      }
+
+      .hero {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 16px;
+        gap: 12px;
+      }
+
+      .hero h1 {
+        font-size: 1.3rem;
+      }
+
+      .button {
+        padding: 9px 12px;
+        font-size: 1rem;
+      }
+
+      .panel-header {
+        padding: 14px 16px;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .panel-body {
+        padding: 14px 16px;
+      }
+
+      .run-detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 320px) {
+      .shell {
+        padding: 8px;
+        gap: 8px;
+      }
+
+      .hero {
+        padding: 12px;
+      }
+
+      .hero h1 {
+        font-size: 1.15rem;
+      }
+
+      .panel-header {
+        padding: 10px 12px;
+      }
+
+      .panel-body {
+        padding: 10px 12px;
+      }
+
+      .badge {
+        padding: 4px 8px;
+        font-size: 0.77rem;
+      }
+
+      .run-card {
+        padding: 10px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="shell">
     <header class="hero">
-      <div>
+      <div class="hero-left">
         <h1>${vscode.l10n.t('AI Review Dashboard')}</h1>
+        <div class="hero-sub">
+          <button class="button" id="refreshButton">${vscode.l10n.t('Refresh')}</button>
+          <div class="notice" id="notice"></div>
+        </div>
       </div>
-      <div class="hero-actions">
+      <div class="hero-right">
         <div class="hero-select">
           <label for="rootSelect">${vscode.l10n.t('Repository')}</label>
           <select class="editor select" id="rootSelect" style="min-height:auto; resize:none; padding:10px 12px;"></select>
         </div>
-        <button class="button" id="refreshButton">${vscode.l10n.t('Refresh')}</button>
       </div>
     </header>
 
@@ -1080,7 +1183,6 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
           <span class="run-subtle" id="repositoryCount"></span>
         </div>
         <div class="panel-body editor-wrap">
-          <div class="notice" id="notice"></div>
           <div class="toolbar">
             <button class="button primary" id="savePromptButton">${vscode.l10n.t('Save Prompt')}</button>
             <button class="button" id="openPromptButton">${vscode.l10n.t('Open in Editor')}</button>
@@ -1089,7 +1191,7 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
             <label for="promptEditor">${vscode.l10n.t('Prompt File')}</label>
             <div class="run-subtle" id="promptPath"></div>
           </div>
-          <textarea class="editor" id="promptEditor" spellcheck="false" placeholder="${vscode.l10n.t('Edit the prompt file for the selected repository.')}"></textarea>
+          <textarea class="editor" id="promptEditor" spellcheck="false"></textarea>
         </div>
       </section>
     </main>
@@ -1119,7 +1221,9 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
       reviewFile: ${JSON.stringify(vscode.l10n.t('Review File'))},
       promptFile: ${JSON.stringify(vscode.l10n.t('Prompt File'))},
       missingFile: ${JSON.stringify(vscode.l10n.t('{0} (missing file, it will be created when you save)'))},
+      missingFileOnly: ${JSON.stringify(vscode.l10n.t('missing prompt file, it will be created when you save'))},
     };
+    const __defaultPrompt = ${JSON.stringify(getDefaultPrompt(vscode.env.language))};
     const initialState = ${initialState};
     let state = initialState;
     let selectedRunId = initialState.selectedRunId;
@@ -1294,12 +1398,15 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
 
     function renderPromptWorkspace() {
       promptEditor.disabled = false;
-      promptEditor.value = state.selectedPromptContent || '';
-      promptPath.textContent = state.selectedPromptFileMissing
-        ? __i18n.missingFile.replace('{0}', state.selectedPromptFilePath)
-        : state.selectedPromptFilePath;
+      promptEditor.value = state.selectedPromptContent || __defaultPrompt;
+      if (state.selectedPromptFileMissing) {
+        promptPath.textContent = __i18n.missingFileOnly;
+        openPromptButton.style.display = 'none';
+      } else {
+        promptPath.textContent = state.selectedPromptFilePath;
+        openPromptButton.style.display = '';
+      }
       savePromptButton.disabled = !state.selectedPromptFilePath;
-      openPromptButton.disabled = !state.selectedPromptFilePath;
     }
 
     function renderNotice() {
