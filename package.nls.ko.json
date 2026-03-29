@@ -1,11 +1,11 @@
 {
   "command.runManualReview": "지금 리뷰 실행",
-  "command.openDashboard": "리뷰 대시보드 열기",
+  "command.openDashboard": "리뷰 Dashboard 열기",
   "command.selectPromptFile": "프롬프트 파일 선택",
   "command.selectReviewFolder": "리뷰 폴더 선택",
   "category": "AI Review",
   "viewContainer.title": "AI Review",
-  "view.dashboard": "AI Review 대시보드",
+  "view.dashboard": "AI Review Dashboard",
   "config.title": "AI Review",
   "config.enabled.description": "현재 저장소에서 자동 AI 리뷰를 활성화합니다.",
   "config.cli.description": "리뷰에 사용할 AI CLI를 선택합니다.",
@@ -29,5 +29,8 @@
   "config.completionNotificationMode.description": "리뷰 완료 시 알림의 동작 방식을 설정합니다.",
   "config.completionNotificationMode.sticky": "닫을 때까지 유지되는 일반 알림을 표시합니다.",
   "config.completionNotificationMode.brief": "자동으로 사라지는 짧은 완료 알림을 표시합니다.",
-  "config.skipCommitKeywords.description": "커밋 메시지에 설정한 키워드가 포함되면 리뷰를 건너뜁니다."
+  "config.skipCommitKeywords.description": "커밋 메시지에 설정한 키워드가 포함되면 리뷰를 건너뜁니다.",
+  "config.claudeArgs.description": "`claude` CLI에 전달할 추가 인수. 필수 플래그(`--permission-mode dontAsk -p ... --model ...`)는 자동으로 추가됩니다.",
+  "config.codexArgs.description": "`codex` CLI에 전달할 추가 인수. 필수 플래그(`-a never --model ...`)는 자동으로 추가됩니다.",
+  "config.copilotArgs.description": "`copilot` CLI에 전달할 추가 인수. 필수 플래그(`--no-ask-user --model ...`)는 자동으로 추가됩니다."
 }
