@@ -2,6 +2,8 @@
 
 VS Code extension that automatically requests an AI code review after a git commit or push.
 
+<img width="1440" height="900" alt="image" src="https://github.com/user-attachments/assets/5949b8c2-6cb3-4387-831c-577ab8d5cc83" />
+
 ## What it supports
 
 - Choose which CLI to run: `claude`, `codex`, or `copilot`
