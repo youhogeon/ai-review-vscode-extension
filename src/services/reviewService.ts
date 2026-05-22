@@ -40,6 +40,10 @@ const CLI_BUILDERS: Record<ReviewContext['provider'], CliBuilder> = {
     }
     args.push('-p', prompt, '--no-ask-user');
     return { command: 'copilot', args };
+  },
+  antigravity(prompt, _model, extraArgs) {
+    const args: string[] = [...extraArgs, '-p', prompt];
+    return { command: 'agy', args };
   }
 };
 

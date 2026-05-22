@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-export type CliProvider = 'claude' | 'codex' | 'copilot';
+export type CliProvider = 'claude' | 'codex' | 'copilot' | 'antigravity';
 export type ReviewTrigger = 'commit' | 'push' | 'commitAndPush' | 'manual';
 export type ReviewOpenMode = 'markdown' | 'text';
 export type StartNotificationMode = 'progress' | 'brief';
@@ -19,6 +19,7 @@ export interface AIReviewConfig {
   claudeArgs: string[];
   codexArgs: string[];
   copilotArgs: string[];
+  antigravityArgs: string[];
   promptFile: string;
   reviewDirectory: string;
   keepReviewFileCount: number;

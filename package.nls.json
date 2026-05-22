@@ -12,13 +12,14 @@
   "config.cli.claude": "Use the `claude` CLI.",
   "config.cli.codex": "Use the `codex` CLI.",
   "config.cli.copilot": "Use the `copilot` CLI.",
+  "config.cli.antigravity": "Use the Antigravity CLI.",
   "config.trigger.description": "When reviews should run.",
   "config.trigger.commit": "Run after a commit is detected.",
   "config.trigger.push": "Run after a push is detected.",
   "config.trigger.commitAndPush": "Run after both commit and push.",
   "config.trigger.manual": "Only run when the manual command is used.",
-  "config.model.description": "Default model name. Leave empty to use the CLI default. Examples: Copilot `gpt-5.4`, Codex `gpt-5.4`, Claude `sonnet`.",
-  "config.smallChangeModel.description": "Lightweight model to use when the changed line count is below the threshold. Leave empty to always use the default model. Examples: Copilot `gpt-4.1-mini`, Codex `gpt-4.1-mini`, Claude `haiku`.",
+  "config.model.description": "Default model name. Leave empty to use the CLI default. Ignored by Antigravity because it does not support model selection. Examples: Copilot `gpt-5.4`, Codex `gpt-5.4`, Claude `sonnet`.",
+  "config.smallChangeModel.description": "Lightweight model to use when the changed line count is below the threshold. Leave empty to always use the default model. Ignored by Antigravity because it does not support model selection. Examples: Copilot `gpt-4.1-mini`, Codex `gpt-4.1-mini`, Claude `haiku`.",
   "config.smallChangeLineThreshold.description": "Use the lightweight model when the changed line count is below this value.",
   "config.promptFile.description": "Prompt file path. Relative paths are resolved from the repository root. The prompt may use `$commit$`, `$commit_range$`, `$trigger$`, and `$repo$` tokens.",
   "config.reviewDirectory.description": "Folder where generated review files are written. Relative paths are resolved from the repository root.",
@@ -35,5 +36,6 @@
   "config.skipCommitKeywords.description": "If any configured keyword appears in the commit message, the review is skipped.",
   "config.claudeArgs.description": "Extra arguments to pass to the `claude` CLI. Required flags (`--permission-mode dontAsk -p ... --model ...`) are added automatically.",
   "config.codexArgs.description": "Extra arguments to pass to the `codex` CLI. Required flags (`-a never --model ...`) are added automatically.",
-  "config.copilotArgs.description": "Extra arguments to pass to the `copilot` CLI. Required flags (`--no-ask-user --model ...`) are added automatically."
+  "config.copilotArgs.description": "Extra arguments to pass to the `copilot` CLI. Required flags (`--no-ask-user --model ...`) are added automatically.",
+  "config.antigravityArgs.description": "Extra arguments to pass to the Antigravity CLI. Required flags (`-p ...`) are added automatically. Model flags are not added because Antigravity does not support model selection."
 }

@@ -24,6 +24,7 @@ export function getConfig(resource: vscode.Uri): AIReviewConfig {
     claudeArgs: normalizeStringArray(config.get<string[]>('claudeArgs', [])),
     codexArgs: normalizeStringArray(config.get<string[]>('codexArgs', [])),
     copilotArgs: normalizeStringArray(config.get<string[]>('copilotArgs', [])),
+    antigravityArgs: normalizeStringArray(config.get<string[]>('antigravityArgs', [])),
     promptFile: normalizeOptionalString(config.get<string>('promptFile', '.review/prompt.md')) || '.review/prompt.md',
     reviewDirectory: normalizeOptionalString(config.get<string>('reviewDirectory', '.review')) || '.review',
     keepReviewFileCount: Math.max(1, Number(config.get<number>('keepReviewFileCount', 10)) || 10),

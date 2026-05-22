@@ -23,7 +23,8 @@
     "ai",
     "codex",
     "claude",
-    "copilot"
+    "copilot",
+    "antigravity"
   ],
   "activationEvents": [
     "onStartupFinished"
@@ -95,12 +96,14 @@
           "enum": [
             "copilot",
             "codex",
-            "claude"
+            "claude",
+            "antigravity"
           ],
           "enumDescriptions": [
-            "%config.cli.claude%",
+            "%config.cli.copilot%",
             "%config.cli.codex%",
-            "%config.cli.copilot%"
+            "%config.cli.claude%",
+            "%config.cli.antigravity%"
           ],
           "default": "copilot",
           "scope": "resource",
@@ -241,6 +244,15 @@
           "default": [],
           "scope": "resource",
           "description": "%config.copilotArgs.description%"
+        },
+        "aiReview.antigravityArgs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "resource",
+          "description": "%config.antigravityArgs.description%"
         }
       }
     }

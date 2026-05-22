@@ -8,7 +8,7 @@ VS Code extension that automatically requests an AI code review after a git comm
 
 ## What it supports
 
-- Choose which CLI to run: `claude`, `codex`, or `copilot`
+- Choose which CLI to run: `claude`, `codex`, `copilot`, or `antigravity`
 - Choose when reviews run: after `commit`, after `push`, both, or manual only
 - Use a lightweight model for small changes (below a configurable line threshold)
 - Configure the prompt file with template tokens
@@ -28,10 +28,10 @@ VS Code extension that automatically requests an AI code review after a git comm
 | Setting | Default | Description |
 |---------|---------|-------------|
 | `aiReview.enabled` | `true` | Enable automatic AI reviews |
-| `aiReview.cli` | `"claude"` | CLI to use: `claude`, `codex`, or `copilot` |
+| `aiReview.cli` | `"claude"` | CLI to use: `claude`, `codex`, `copilot`, or `antigravity` |
 | `aiReview.trigger` | `"commit"` | When to run: `commit`, `push`, `commitAndPush`, or `manual` |
-| `aiReview.model` | `""` | Default model name (empty = CLI default) |
-| `aiReview.smallChangeModel` | `""` | Lightweight model for small changes (empty = always use default) |
+| `aiReview.model` | `""` | Default model name (empty = CLI default, ignored by Antigravity) |
+| `aiReview.smallChangeModel` | `""` | Lightweight model for small changes (empty = always use default, ignored by Antigravity) |
 | `aiReview.smallChangeLineThreshold` | `50` | Use the lightweight model when changed lines are below this value |
 | `aiReview.promptFile` | `".review/prompt.md"` | Path to the prompt template file |
 | `aiReview.reviewDirectory` | `".review"` | Folder where review files are written |
@@ -58,6 +58,7 @@ The prompt file can use these placeholders:
 - Only pure commits (including amend and cherry-pick) and pushes trigger reviews. Pull, rebase, merge, fetch, and reset are ignored.
 - Push detection uses ahead/behind transitions and is best-effort for external git activity.
 - The extension assumes the selected CLI is already installed and available in `PATH`.
+- Antigravity is invoked with the `agy` command as `agy -p "<prompt>"`; model settings are not passed because Antigravity does not support model selection.
 
 
 ----
@@ -68,7 +69,7 @@ git 커밋 또는 푸시 이후 자동으로 AI 코드 리뷰를 요청하는 VS
 
 ## 지원 기능
 
-- 실행할 CLI 선택: `claude`, `codex`, 또는 `copilot`
+- 실행할 CLI 선택: `claude`, `codex`, `copilot`, 또는 `antigravity`
 - 리뷰 실행 시점 선택: `commit` 이후, `push` 이후, 둘 다, 또는 수동만
 - 작은 변경 사항에 대해 경량 모델 사용 (설정 가능한 라인 수 임계값 이하)
 - 템플릿 토큰을 사용하여 프롬프트 파일 구성
@@ -88,10 +89,10 @@ git 커밋 또는 푸시 이후 자동으로 AI 코드 리뷰를 요청하는 VS
 | 설정 | 기본값 | 설명 |
 |---------|---------|-------------|
 | `aiReview.enabled` | `true` | 자동 AI 리뷰 활성화 |
-| `aiReview.cli` | `"claude"` | 사용할 CLI: `claude`, `codex`, 또는 `copilot` |
+| `aiReview.cli` | `"claude"` | 사용할 CLI: `claude`, `codex`, `copilot`, 또는 `antigravity` |
 | `aiReview.trigger` | `"commit"` | 실행 시점: `commit`, `push`, `commitAndPush`, 또는 `manual` |
-| `aiReview.model` | `""` | 기본 모델 이름 (비어있음 = CLI 기본값 사용) |
-| `aiReview.smallChangeModel` | `""` | 작은 변경 사항용 경량 모델 (비어있음 = 항상 기본값 사용) |
+| `aiReview.model` | `""` | 기본 모델 이름 (비어있음 = CLI 기본값 사용, Antigravity에서는 무시됨) |
+| `aiReview.smallChangeModel` | `""` | 작은 변경 사항용 경량 모델 (비어있음 = 항상 기본값 사용, Antigravity에서는 무시됨) |
 | `aiReview.smallChangeLineThreshold` | `50` | 변경된 라인 수가 이 값보다 적을 때 경량 모델 사용 |
 | `aiReview.promptFile` | `".review/prompt.md"` | 프롬프트 템플릿 파일 경로 |
 | `aiReview.reviewDirectory` | `".review"` | 리뷰 파일이 작성되는 폴더 |
@@ -118,3 +119,4 @@ git 커밋 또는 푸시 이후 자동으로 AI 코드 리뷰를 요청하는 VS
 - 순수 커밋(수정 커밋, 체리픽 포함)과 푸시만 리뷰를 트리거함. pull, rebase, merge, fetch, reset은 무시됨.
 - 푸시 감지는 ahead/behind 상태 변화를 사용하며, 외부 git 활동에 대해서는 best-effort 방식임.
 - 확장 프로그램은 선택된 CLI가 이미 설치되어 있고 `PATH`에서 사용 가능하다고 가정함.
+- Antigravity는 `agy` 명령어를 사용해 `agy -p "<prompt>"` 형태로 실행되며, 모델 선택을 지원하지 않으므로 모델 설정은 전달하지 않음.

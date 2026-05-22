@@ -441,6 +441,10 @@ export class AIReviewController {
   }
 
   private resolveModel(config: AIReviewConfig, changedLines: number): string {
+    if (config.cli === 'antigravity') {
+      return '';
+    }
+
     if (config.smallChangeModel && changedLines < config.smallChangeLineThreshold) {
       return config.smallChangeModel;
     }
@@ -452,7 +456,8 @@ export class AIReviewController {
     const argsMap: Record<CliProvider, string[]> = {
       claude: config.claudeArgs,
       codex: config.codexArgs,
-      copilot: config.copilotArgs
+      copilot: config.copilotArgs,
+      antigravity: config.antigravityArgs
     };
 
     return argsMap[config.cli] ?? [];
