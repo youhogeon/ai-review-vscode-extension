@@ -11,7 +11,13 @@ import {
 } from './types';
 import { normalizeOptionalString, normalizeStringArray } from './utils';
 
-export function getConfig(resource: vscode.Uri): AIReviewConfig {
+export interface ResourceSettingUpdateResult {
+  settingId: string;
+  target: vscode.ConfigurationTarget;
+  scopeLabel: string;
+}
+
+export function getConfig(resource: vscode.Uri | undefined): AIReviewConfig {
   const config = vscode.workspace.getConfiguration(CONFIG_SECTION, resource);
 
   return {
@@ -39,12 +45,26 @@ export async function updateResourceSetting(
   resource: vscode.Uri | undefined,
   key: string,
   value: string
-): Promise<void> {
-  const config = vscode.workspace.getConfiguration(CONFIG_SECTION, resource);
+): Promise<ResourceSettingUpdateResult> {
+  const settingId = `${CONFIG_SECTION}.${key}`;
+  const config = vscode.workspace.getConfiguration(undefined, resource);
+  const workspaceFolder = resource ? vscode.workspace.getWorkspaceFolder(resource) : undefined;
   const hasMultiRoot = Boolean(vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 1);
-  const target = resource
-    ? (hasMultiRoot ? vscode.ConfigurationTarget.WorkspaceFolder : vscode.ConfigurationTarget.Workspace)
-    : vscode.ConfigurationTarget.Global;
 
-  await config.update(key, value, target);
+  let target = vscode.ConfigurationTarget.Global;
+  let scopeLabel = 'global settings';
+
+  if (workspaceFolder && hasMultiRoot) {
+    target = vscode.ConfigurationTarget.WorkspaceFolder;
+    scopeLabel = `workspace folder settings (${workspaceFolder.uri.fsPath})`;
+  } else if (workspaceFolder || vscode.workspace.workspaceFile || vscode.workspace.workspaceFolders?.length) {
+    target = vscode.ConfigurationTarget.Workspace;
+    scopeLabel = vscode.workspace.workspaceFile
+      ? `workspace settings (${vscode.workspace.workspaceFile.fsPath})`
+      : `workspace settings (${workspaceFolder?.uri.fsPath ?? vscode.workspace.workspaceFolders?.[0]?.uri.fsPath})`;
+  }
+
+  await config.update(settingId, value, target);
+
+  return { settingId, target, scopeLabel };
 }

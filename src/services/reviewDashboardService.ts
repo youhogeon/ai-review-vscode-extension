@@ -3,9 +3,9 @@ import * as path from 'path';
 import { randomUUID } from 'crypto';
 import * as vscode from 'vscode';
 
-import { getConfig } from '../config';
+import { getConfig, updateResourceSetting } from '../config';
 import { getPreferredWorkspaceFolder, resolvePath } from '../utils';
-import { CommandResult, ProcessHandle, ReviewRunRecord, ReviewRunStatus } from '../types';
+import { CliProvider, CommandResult, ProcessHandle, ReviewRunRecord, ReviewRunStatus } from '../types';
 import { getDefaultPrompt } from '../constants';
 
 interface DashboardWebviewState {
@@ -17,6 +17,8 @@ interface DashboardWebviewState {
   selectedPromptContent: string;
   selectedPromptFilePath: string;
   selectedPromptFileMissing: boolean;
+  selectedCli: CliProvider;
+  selectedModel: string;
   notice: string;
 }
 
@@ -304,6 +306,36 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
     await this.refreshWebview();
   }
 
+  async saveSelectedReviewSettings(cli: string, model: string): Promise<void> {
+    if (!this.isCliProvider(cli)) {
+      this.output.appendLine(`[warn] Ignoring invalid dashboard CLI setting: ${cli}`);
+      return;
+    }
+
+    const resource = this.getSelectedConfigResource();
+    const trimmedModel = model.trim();
+
+    const cliUpdate = await updateResourceSetting(resource, '_cli', cli);
+    await updateResourceSetting(resource, '_model', trimmedModel);
+    const savedConfig = getConfig(resource);
+
+    if (savedConfig.cli !== cli || savedConfig.model !== trimmedModel) {
+      this.output.appendLine(
+        `[warn] Review settings did not round-trip after save. Expected cli=${cli}, model=${trimmedModel}; ` +
+          `read cli=${savedConfig.cli}, model=${savedConfig.model}; scope=${cliUpdate.scopeLabel}; key=${cliUpdate.settingId}`
+      );
+      this.notice = vscode.l10n.t('Review settings could not be saved. Check the AI Review output for details.');
+      await this.refreshWebview();
+      return;
+    }
+
+    this.output.appendLine(
+      `[info] Saved ${cliUpdate.settingId} and aiReview._model from dashboard to ${cliUpdate.scopeLabel}.`
+    );
+    this.notice = vscode.l10n.t('Saved review settings.');
+    await this.refreshWebview();
+  }
+
   async openSelectedPromptInEditor(): Promise<void> {
     const target = await this.getPromptTarget();
     if (!target) {
@@ -372,6 +404,8 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
       type?: unknown;
       runId?: unknown;
       content?: unknown;
+      cli?: unknown;
+      model?: unknown;
       message?: unknown;
       source?: unknown;
       line?: unknown;
@@ -416,6 +450,11 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
 
     if (payload.type === 'savePrompt' && typeof payload.content === 'string') {
       await this.saveSelectedPrompt(payload.content);
+      return;
+    }
+
+    if (payload.type === 'saveReviewSettings' && typeof payload.cli === 'string' && typeof payload.model === 'string') {
+      await this.saveSelectedReviewSettings(payload.cli, payload.model);
       return;
     }
 
@@ -481,6 +520,27 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
       promptMissing: loaded.missing,
       scopeLabel: `workspace ${workspaceFolder.uri.fsPath}`
     };
+  }
+
+  private getSelectedReviewSettings(): { cli: CliProvider; model: string } {
+    const config = getConfig(this.getSelectedConfigResource());
+
+    return {
+      cli: config.cli,
+      model: config.model
+    };
+  }
+
+  private isCliProvider(value: string): value is CliProvider {
+    return value === 'copilot' || value === 'codex' || value === 'claude' || value === 'antigravity';
+  }
+
+  private getSelectedConfigResource(): vscode.Uri | undefined {
+    if (this.selectedRoot) {
+      return vscode.Uri.file(this.selectedRoot);
+    }
+
+    return this.getSelectedWorkspaceFolder()?.uri;
   }
 
   private getSelectedWorkspaceFolder(): vscode.WorkspaceFolder | undefined {
@@ -579,6 +639,7 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
           promptMissing: effectiveSelectedRun.promptMissing
         }
       : await this.getPromptTarget();
+    const reviewSettings = this.getSelectedReviewSettings();
 
     return {
       repositories,
@@ -589,6 +650,8 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
       selectedPromptContent: promptTarget?.promptContent ?? '',
       selectedPromptFilePath: promptTarget?.promptFilePath ?? '',
       selectedPromptFileMissing: promptTarget?.promptMissing ?? false,
+      selectedCli: reviewSettings.cli,
+      selectedModel: reviewSettings.model,
       notice: this.notice
     };
   }
@@ -630,6 +693,7 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
     }));
 
     const selectedRun = this.getSelectedRun();
+    const reviewSettings = this.getSelectedReviewSettings();
     return {
       repositories,
       selectedRoot,
@@ -639,6 +703,8 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
       selectedPromptContent: selectedRun?.promptContent ?? '',
       selectedPromptFilePath: selectedRun?.promptFilePath ?? '',
       selectedPromptFileMissing: selectedRun?.promptMissing ?? false,
+      selectedCli: reviewSettings.cli,
+      selectedModel: reviewSettings.model,
       notice: this.notice
     };
   }
@@ -836,6 +902,56 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
       padding: 18px 20px;
       overflow: auto;
       max-height: calc(100vh - 220px);
+    }
+
+    .settings-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .settings-grid .field {
+      grid-template-columns: max-content minmax(0, 1fr);
+      align-items: center;
+      column-gap: 12px;
+    }
+
+    .settings-grid .field label {
+      white-space: nowrap;
+    }
+
+    .settings-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .settings-help {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 0.92rem;
+    }
+
+    .config-control {
+      width: 100%;
+      min-height: 42px;
+      resize: none;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(2, 6, 23, 0.9);
+      color: var(--text);
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 1rem;
+      line-height: 1.4;
+      outline: none;
+    }
+
+    .config-control:focus {
+      border-color: rgba(56, 189, 248, 0.75);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
     }
 
     .run-list {
@@ -1151,6 +1267,33 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
       <div class="left-stack">
         <section class="panel">
           <div class="panel-header">
+            <h2>${vscode.l10n.t('Review Settings')}</h2>
+          </div>
+          <div class="panel-body">
+            <div class="settings-grid">
+              <div class="field">
+                <label for="cliSelect">CLI</label>
+                <select class="config-control" id="cliSelect">
+                  <option value="copilot">copilot</option>
+                  <option value="codex">codex</option>
+                  <option value="claude">claude</option>
+                  <option value="antigravity">antigravity</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="modelInput">Model</label>
+                <input class="config-control" id="modelInput" type="text" placeholder="${vscode.l10n.t('CLI default')}" />
+              </div>
+              <div class="settings-actions">
+                <button class="button primary" id="saveReviewSettingsButton">${vscode.l10n.t('Save Settings')}</button>
+                <p class="settings-help">${vscode.l10n.t('Search AIReview in VS Code settings for more settings.')}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
             <h2>${vscode.l10n.t('Active Runs')}</h2>
             <span class="run-subtle" id="runCount"></span>
           </div>
@@ -1240,9 +1383,12 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
     const notice = document.getElementById('notice');
     const promptEditor = document.getElementById('promptEditor');
     const promptPath = document.getElementById('promptPath');
+    const cliSelect = document.getElementById('cliSelect');
+    const modelInput = document.getElementById('modelInput');
     const refreshButton = document.getElementById('refreshButton');
     const savePromptButton = document.getElementById('savePromptButton');
     const openPromptButton = document.getElementById('openPromptButton');
+    const saveReviewSettingsButton = document.getElementById('saveReviewSettingsButton');
 
     function statusLabel(status) {
       return __i18n[status] || status;
@@ -1409,6 +1555,11 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
       savePromptButton.disabled = !state.selectedPromptFilePath;
     }
 
+    function renderReviewSettings() {
+      cliSelect.value = state.selectedCli || 'copilot';
+      modelInput.value = state.selectedModel || '';
+    }
+
     function renderNotice() {
       notice.textContent = state.notice || '';
       notice.style.display = state.notice ? 'block' : 'none';
@@ -1416,6 +1567,7 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
 
     function render() {
       renderRepositorySelector();
+      renderReviewSettings();
       renderRunList();
       renderPromptWorkspace();
       renderNotice();
@@ -1434,9 +1586,20 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
     rootSelect.addEventListener('change', () => vscode.postMessage({ type: 'selectRoot', runId: rootSelect.value }));
     savePromptButton.addEventListener('click', () => vscode.postMessage({ type: 'savePrompt', content: promptEditor.value }));
     openPromptButton.addEventListener('click', () => vscode.postMessage({ type: 'openPrompt' }));
+    saveReviewSettingsButton.addEventListener('click', () => {
+      vscode.postMessage({ type: 'saveReviewSettings', cli: cliSelect.value, model: modelInput.value });
+    });
 
     promptEditor.addEventListener('input', () => {
       state.selectedPromptContent = promptEditor.value;
+    });
+
+    cliSelect.addEventListener('change', () => {
+      state.selectedCli = cliSelect.value;
+    });
+
+    modelInput.addEventListener('input', () => {
+      state.selectedModel = modelInput.value;
     });
 
     window.addEventListener('message', (event) => {
@@ -1486,4 +1649,3 @@ export class ReviewDashboardService implements vscode.WebviewViewProvider {
     return Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
   }
 }
-
